@@ -9,12 +9,16 @@
 
 void restart()
 {
-	printf("\nDo you want to generate another one?(y/n)");
+	printf("Do you want to generate another one?(y/n)");
 	char start;
-	scanf("%c",&start);
+	scanf("%s",&start);
 	if (start=='y')
 	{
 		main();
+	}
+	else
+	{
+		exit;
 	}
 }
 
@@ -32,6 +36,7 @@ void save(int n, char c[n])
 		for (i=0; i<n; i++) {printf("%c",c[i]);}
 		fclose(stdout);
 	}
+	restart();
 }
 
 int main()
@@ -56,6 +61,5 @@ int main()
 		printf("%c",c[i]);
 	}
 	save(n,c);
-	restart();
 	return 0;
 }
