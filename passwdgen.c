@@ -1,5 +1,6 @@
 /* using: to get password enter length of it.
  * also it save pass to entered location
+ * 
  */
 
 
@@ -15,10 +16,6 @@ void restart()
 	{
 		main();
 	}
-	else
-	{
-		exit;
-	}
 }
 
 void save(int n, char c[n])
@@ -27,7 +24,7 @@ void save(int n, char c[n])
 	char s,name;
 	int i;
 	scanf("%c",&s);
-	switch (s)
+	/*switch (s)
 	{
 		case 'y' :
 		{
@@ -37,7 +34,7 @@ void save(int n, char c[n])
 			for (i=0; i<n; i++) {printf("%c",c[i]);}
 		};break;
 		case 'n' : break;
-	}
+	}*/
 }
 
 int main()
