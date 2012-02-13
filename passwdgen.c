@@ -21,20 +21,17 @@ void restart()
 void save(int n, char c[n])
 {
 	printf("\nDo you want to save it?(y/n) ");
-	char s,name;
+	char s,name[200];
 	int i;
-	scanf("%c",&s);
-	/*switch (s)
+	scanf("%s",&s);
+	if (s=='y')
 	{
-		case 'y' :
-		{
-			printf("\nEnter file name: ");
-			scanf("%s",&name);
-			freopen(name,"w",stdout);
-			for (i=0; i<n; i++) {printf("%c",c[i]);}
-		};break;
-		case 'n' : break;
-	}*/
+		printf("Enter file name: ");
+		scanf("%s",&name);
+		freopen(name,"w",stdout);
+		for (i=0; i<n; i++) {printf("%c",c[i]);}
+		fclose(stdout);
+	}
 }
 
 int main()
