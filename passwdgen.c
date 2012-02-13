@@ -1,9 +1,7 @@
 /* using: to get password enter length of it.
  * also it save pass to entered location
- * 
  */
-
-
+ 
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -11,7 +9,7 @@ void restart()
 {
 	printf("Do you want to generate another one?(y/n)");
 	char start;
-	scanf("%s",&start);
+	scanf("\n%c",&start);
 	if (start=='y')
 	{
 		main();
@@ -27,11 +25,11 @@ void save(int n, char c[n])
 	printf("\nDo you want to save it?(y/n) ");
 	char s,name[200];
 	int i;
-	scanf("%s",&s);
+	scanf("\n%c",&s);
 	if (s=='y')
 	{
 		printf("Enter file name: ");
-		scanf("%s",&name);
+		scanf("\n%c",&name);
 		freopen(name,"w",stdout);
 		for (i=0; i<n; i++) {printf("%c",c[i]);}
 		fclose(stdout);
