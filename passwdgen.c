@@ -29,7 +29,7 @@ void save(int n, char c[n])
 	if (s=='y')
 	{
 		printf("Enter file name: ");
-		scanf("\n%c",&name);
+		scanf("\n%s",&name);
 		freopen(name,"w",stdout);
 		for (i=0; i<n; i++) {printf("%c",c[i]);}
 		fclose(stdout);
