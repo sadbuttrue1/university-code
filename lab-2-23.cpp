@@ -15,29 +15,31 @@ void matrix_input(float *a, int n, int m)
 
 void s_points(float *a, int n, int m)
 {
-	float imin[n],jmax[m];
+	float imin[n],imax[n],jmax[m],jmin[m];
 	int i,j;
 	for (i=0; i<n; i++)
 	{
-		imin[i]=a[i*m];
+		imax[i]=imin[i]=a[i*m];
 	}
 	for (j=0; j<m; j++)
 	{
-		jmax[j]=a[j];
+		jmin[j]=jmax[j]=a[j];
 	}
 	for (i=0; i<n; i++)
 	{
 		for (j=0; j<m; j++)
 		{
 			if (a[i*m+j]<imin[i]) imin[i]=a[i*m+j];
-			if (a[i*m+j]>jmax[j]) jmax[j]=a[i*m+j];			
+			if (a[i*m+j]>imax[i]) imax[i]=a[i*m+j];
+			if (a[i*m+j]>jmax[j]) jmax[j]=a[i*m+j];
+			if (a[i*m+j]<jmin[j]) jmin[j]=a[i*m+j];			
 		}
 	}
 	for (i=0; i<n; i++)
 	{
 		for (j=0; j<m; j++)
 		{
-			if ((a[i*m+j]==imin[i])&&(a[i*m+j]==jmax[j]))
+			if (((a[i*m+j]==imin[i])&&(a[i*m+j]==jmax[j])) || ((a[i*m+j]==imax[i])&&(a[i*m+j]==jmin[j])))
 			printf("%f (%d,%d)\n",a[i*m+j],i,j);
 		}
 	}
