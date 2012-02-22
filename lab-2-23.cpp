@@ -3,14 +3,27 @@
 
 void matrix_input(float *a, int n, int m)
 {
-	int i,j;
-	for (i=0; i<n; i++)
+	printf("Введите элементы массива (построчно через пробел):\n");
+	for (int i=0; i<n; i++)
 	{
-		for (j=0; j<m; j++)
+		for (int j=0; j<m; j++)
 		{
 			scanf("%f",&a[i*m+j]);
 		}
 	}
+}
+
+void matrix_output(float *a, int n, int m)
+{
+	for (int i=0; i<n; i++)
+	{
+		for (int j=0; j<m; j++)
+		{
+			printf("%f ",a[i*m+j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
 }
 
 void s_points(float *a, int n, int m)
@@ -51,51 +64,28 @@ void ex1()
 	int n,m;
 	scanf("\n%dx%d",&n,&m);
 	float array[n*m];
-	printf("Введите элементы массива:\n");
 	matrix_input(array,n,m);
+	printf("\nВведенная вами матрица:\n");
+	matrix_output(array,n,m);
 	s_points(array,n,m);
 }
 
-void hex(int x)
+static const char hex_const[]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+
+void hex(int x, char *res)
 {
-	int dig[40],i=0;
-	while (x/16>0)
+	int i=0;
+	while (x>0)
 	{
-		dig[i]=x%16;
+		res[7-i]=hex_const[x%16];
 		x/=16;
 		i++;
 	}
-	dig[i]=x;
-	char str[20];
-	int n;
-	for (n=0; n<i+1; n++)
+	for (; i<8; i++)
 	{
-		switch (dig[n])
-		{
-			case 0:
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			str[n]=(char)(dig[n]+48);break;
-			case 10: str[n]='A';break;
-			case 11: str[n]='B';break;
-			case 12: str[n]='C';break;
-			case 13: str[n]='D';break;
-			case 14: str[n]='E';break;
-			case 15: str[n]='F';break;
-			default : break;
-		}
+		res[7-i]='0';
 	}
-	for (n=i; n>-1; n--)
-	{
-		printf("%c",str[n]);
-	}
+	res[8]=0;
 }
 
 void ex2()
@@ -103,7 +93,9 @@ void ex2()
 	printf("Введите число, которое нужно представить в шестнадцетиричном виде\n");
 	int x;
 	scanf("%d",&x);
-	hex(x);
+	char res[9];
+	hex(x,res);
+	printf("%s",res);
 }
 
 void ex()
@@ -115,7 +107,7 @@ void ex()
 	{
 		case '1': ex1();break;
 		case '2': ex2();break;
-		case 'q': exit;break;
+		case 'q': return;break;
 		default : break;
 	}
 }
@@ -123,13 +115,12 @@ void ex()
 int main()
 {
 	printf("Написать программу, которая вводит с клавиатуры массив NxM вещественных чисел,\nещет седловые точки в массиве и выводит их и их позиции пользователю;\nзатем вводит с клавиатуры число, преобразовывает его в строку в шестнадцатеричном представлении и выводит результат пользователю.\n");
-	ex();
-	printf("\nПерезапустить? (y/n)\n");
-	char start;
-	scanf("\n%c",&start);
-	if (start=='y')
+	char start='y';
+	while (start=='y')
 	{
-		main();
+		ex();
+		printf("\nПерезапустить? (y/n)\n");
+		scanf("\n%c",&start);
 	}
 	return 0;
 }
