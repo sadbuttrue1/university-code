@@ -12,7 +12,11 @@ struct p_const
 void p_output(p_const *head)
 {
 	p_const *p=head;
-	while(p) if (p->count!=0){printf("%Ld) %f\n",p->num,p->count);p=p->next;}
+	while(p)
+	{
+		if (p->count!=0.0) printf("%Ld) %f\n",p->num,p->count);
+		p=p->next;
+	}
 }
 
 p_const *p_init(p_const *head)
