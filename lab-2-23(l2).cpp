@@ -55,20 +55,19 @@ void p_delete(p_const *head)
 p_const *p_search_num(p_const *head, unsigned long long int num)
 {
 	p_const *p=head,*q,*t;
-	bool equal=false,insert=false;
-	while (p && (!equal) && (!insert))
+	bool insert=false;
+	while (p && (p->num!=num) && (!insert))
 	{
 		q=p;
 		p=p->next;
-		if ((p!=NULL) && (p->num==num)) equal=true;
-		else if ((p!=NULL) && (q->num>num) && (p->num<num))
-				{
-					t=new p_const;
-					q->next=t;
-					t->num=num;
-					t->next=p;
-					insert=true;
-				}
+		if ((p!=NULL) && (q->num>num) && (p->num<num))
+			{
+				t=new p_const;
+				q->next=t;
+				t->num=num;
+				t->next=p;
+				insert=true;
+			}
 	}
 	if (insert)
 	{
@@ -77,25 +76,41 @@ p_const *p_search_num(p_const *head, unsigned long long int num)
 	return p;
 }
 
+void p_delete_elem(p_const *head, unsigned long long int num)
+{
+	p_const *q,*p=head;
+	while (p && (p->num!=num)) {q=p; p=p->next;}
+	if (p->num == num)
+	{
+		q->next=p->next;
+		delete p;
+		p=NULL;
+	}
+}
+
 p_const *p_replace(p_const *head)
 {
 	p_output(head);
 	float count;
 	unsigned long long int num;
 	p_const *p;
-	printf("Введите номер коэффициента, который вы хотите изменить или создать:");
+	printf("Введите номер коэффициента, который вы хотите изменить или создать (для удаления используйте номера существующих элементов):");
 	scanf("%Ld",&num);
-	printf("Введите новое значение коэффициента:");
+	printf("Введите новое значение коэффициента (введите 0, если хотите убрать этот коэффициент):");
 	scanf("%f",&count);
-	p=p_search_num(head,num);
-	if (p!=NULL) p->count=count;
-	else 
+	if (count == 0) p_delete_elem(head,num);
+	else
 	{
-		p=new p_const;
-		p->num=num;
-		p->count=count;
-		p->next=head;
-		head=p;
+		p=p_search_num(head,num);
+		if (p!=NULL) p->count=count;
+		else 
+		{
+			p=new p_const;
+			p->num=num;
+			p->count=count;
+			p->next=head;
+			head=p;
+		}
 	}
 	printf("Новые коэффициенты:\n");
 	p_output(head);
