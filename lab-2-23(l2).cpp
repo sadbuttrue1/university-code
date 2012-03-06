@@ -184,9 +184,9 @@ void main_menu()
 				i++;
 				printf("%d) Изменить, удалить или добавить коэффициент второго многочлена\n",i);
 				i++;
-				printf("%d) Вычислить второй многочлен для заданного Y\n",i);
+				printf("%d) Вычислить второй многочлен для заданного X\n",i);
 				i++;
-				printf("%d) Вычислить сумму многочленов P(x) и G(y) для заданных x и y\n",i);
+				printf("%d) Вычислить сумму многочленов P1(x1) и P2(x2) для заданных x и y\n",i);
 			}
 		}
 		i++;
@@ -242,18 +242,18 @@ void main_menu()
 						printf("Введите значение X:");
 						double s;
 						s=p_calc(head1);
-						printf("P(x)=%f\n",s);
+						printf("P1(x)=%f\n",s);
 					}break;
 					case '4': p_output(head2);break;
 					case '5': head2=p_replace(head2);break;
 					case '6':
 					{
-						printf("Введите значение Y:");
+						printf("Введите значение X:");
 						double s;
 						s=p_calc(head2);
-						printf("G(y)=%f\n",s);
+						printf("P2(x)=%f\n",s);
 					}break;
-					case '7': printf("P(x)+G(y)=%f\n",p_sum(head1,head2));break;
+					case '7': printf("P1(x1)+P2(x2)=%f\n",p_sum(head1,head2));break;
 					case '8': d=false;break;
 				}
 			}
