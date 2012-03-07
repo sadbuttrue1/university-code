@@ -12,11 +12,14 @@ struct p_const
 void p_output(p_const *head)
 {
 	p_const *p=head;
+	//printf("P(x)=");
 	while(p)
 	{
-		printf("%Ld) %f\n",p->num,p->count);
+		printf("%0.1f*x^%Ld",p->count,p->num);
 		p=p->next;
+		if (p) printf("+");
 	}
+	printf("\n");
 }
 
 p_const *p_init(p_const *head)
@@ -52,9 +55,28 @@ void p_delete(p_const *head)
 	}
 }
 
-p_const *p_search_num(p_const *head, unsigned long long int num)
+void p_delete_elem(p_const *&head, unsigned long long int num)
 {
-	p_const *p=head,*q,*t;
+	p_const *q,*p=head;
+	while (p && (p->num!=num)) {q=p; p=p->next;}
+	if ((p->num == num) && (p==head))
+	{
+		head=p->next;
+		delete p;
+		p=NULL;
+	}
+	else
+	if (p->num == num)
+	{
+		q->next=p->next;
+		delete p;
+		p=NULL;
+	}
+}
+
+p_const *p_search_num(p_const *&head, unsigned long long int num)
+{
+	p_const *p=head,*q=p,*t;
 	bool insert=false;
 	while (p && (p->num!=num) && (!insert))
 	{
@@ -73,23 +95,21 @@ p_const *p_search_num(p_const *head, unsigned long long int num)
 	{
 		p=t;
 	}
+	else
+	if (p==NULL)
+	{
+		t=new p_const;
+		t->num=num;
+		t->next=head;
+		head=t;
+		p=t;
+	}
 	return p;
 }
 
-void p_delete_elem(p_const *head, unsigned long long int num)
+p_const *p_replace(p_const *&head)
 {
-	p_const *q,*p=head;
-	while (p && (p->num!=num)) {q=p; p=p->next;}
-	if (p->num == num)
-	{
-		q->next=p->next;
-		delete p;
-		p=NULL;
-	}
-}
-
-p_const *p_replace(p_const *head)
-{
+	printf("P(x)=");
 	p_output(head);
 	float count;
 	unsigned long long int num;
@@ -102,25 +122,16 @@ p_const *p_replace(p_const *head)
 	else
 	{
 		p=p_search_num(head,num);
-		if (p!=NULL) p->count=count;
-		else 
-		{
-			p=new p_const;
-			p->num=num;
-			p->count=count;
-			p->next=head;
-			head=p;
-		}
+		p->count=count;
 	}
-	printf("Новые коэффициенты:\n");
+	printf("Новый многочлен:\n");
+	printf("P(x)=");
 	p_output(head);
 	return head;
 }
 
-double p_calc(p_const *head)
+double p_calc(p_const *head, float x)
 {
-	float x;
-	scanf("%f",&x);
 	p_const *p=head;
 	double s=0;
 	while (p) 
@@ -133,14 +144,55 @@ double p_calc(p_const *head)
 	return s;
 }
 
-double p_sum(p_const *head1, p_const *head2)
+p_const *p_search(p_const *head, unsigned long long int num)
 {
-	printf("Введите значение X:");
-	double s;
-	s=p_calc(head1);
-	printf("Введите значение Y:");
-	s+=p_calc(head2);
-	return s;
+	p_const *p=head;
+	while (p && (p->num!=num)) p=p->next;
+	return p;
+}
+
+void p_sum(p_const *head1, p_const *head2)
+{
+	printf("P1(x)=");
+	p_output(head1);
+	printf("P2(x)=");
+	p_output(head2);
+	p_const *p=head1;
+	while (p)
+	{
+		p_const *q=p_search(head2, p->num);
+		if (q!=NULL) p->count+=q->count;
+		p=p->next;
+	}
+	p=head2;
+	while (p)
+	{
+		p_const *q=p_search(head1, p->num);
+		if (q==NULL)
+		{
+			q=p_search_num(head1, p->num);
+			q->count=p->count;
+		}
+		p=p->next;
+	}
+	p=head1;
+	while (p)
+	{
+		if (p->count==0) p_delete_elem(head1,p->num);
+		p=p->next;
+	}
+	printf("P1(x)+P2(x)=");
+	p_output(head1);
+	printf("Хотите вычислить P1(x)+P2(x) для заданного X? (y/n):");
+	char c;
+	scanf("\n%c",&c);
+	if (c=='y')
+	{
+		printf("Введите X:");
+		float x;
+		scanf("%f",&x);
+		printf("P1(%f)+P2(%f)=%f",x,x,p_calc(head1,x));
+	}
 }
 
 void main_menu()
@@ -186,7 +238,7 @@ void main_menu()
 				i++;
 				printf("%d) Вычислить второй многочлен для заданного X\n",i);
 				i++;
-				printf("%d) Вычислить сумму многочленов P1(x1) и P2(x2) для заданных x и y\n",i);
+				printf("%d) Вычислить сумму многочленов P1(x1) и P2(x2)\n",i);
 			}
 		}
 		i++;
@@ -213,13 +265,19 @@ void main_menu()
 				switch (choice)
 				{
 					case '0': printf("Написать программу, реализующую в виде списка представление многочлена P(x)=a_0+a_1*x+...+a_i*x^i, где а_i - вещественные числа, i - целые положительные числа, причем, если a_i=0, то соответствующий элемент-слагаемое должен отсутствовать в списке. Пользователь должен иметь возможность произвольно добавлять элементы-слагаемые через меню. Реализовать функцию сложения двух многочленов\n");break;
-					case '1': p_output(head1);break;
+					case '1': 
+					{
+						printf("P(x)=");
+						p_output(head1);
+					}break;
 					case '2': head1=p_replace(head1);break;
 					case '3':
 					{
 						printf("Введите значение X:");
 						double s;
-						s=p_calc(head1);
+						float x;
+						scanf("%f",&x);
+						s=p_calc(head1,x);
 						printf("Значение P(x)=%f",s);
 					}break;
 					case '4':
@@ -235,25 +293,37 @@ void main_menu()
 				switch (choice)
 				{
 					case '0': printf("Написать программу, реализующую в виде списка представление многочлена P(x)=a_0+a_1*x+...+a_i*x^i, где а_i - вещественные числа, i - целые положительные числа, причем, если a_i=0, то соответствующий элемент-слагаемое должен отсутствовать в списке. Пользователь должен иметь возможность произвольно добавлять элементы-слагаемые через меню. Реализовать функцию сложения двух многочленов.\n");break;
-					case '1': p_output(head1);break;
+					case '1': 
+					{
+						printf("P(x)=");
+						p_output(head1);
+					}break;
 					case '2': head1=p_replace(head1);break;
 					case '3':
 					{
 						printf("Введите значение X:");
 						double s;
-						s=p_calc(head1);
+						float x;
+						scanf("%f",&x);
+						s=p_calc(head1,x);
 						printf("P1(x)=%f\n",s);
 					}break;
-					case '4': p_output(head2);break;
+					case '4': 
+					{
+						printf("P(x)");
+						p_output(head2);
+					}break;
 					case '5': head2=p_replace(head2);break;
 					case '6':
 					{
 						printf("Введите значение X:");
 						double s;
-						s=p_calc(head2);
+						float x;
+						scanf("%f",&x);
+						s=p_calc(head2,x);
 						printf("P2(x)=%f\n",s);
 					}break;
-					case '7': printf("P1(x1)+P2(x2)=%f\n",p_sum(head1,head2));break;
+					case '7': p_sum(head1,head2);break;
 					case '8': d=false;break;
 				}
 			}
