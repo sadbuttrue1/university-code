@@ -9,10 +9,14 @@ struct p_const
 	p_const* next;
 };
 
+void output_ex()
+{
+	printf("Написать программу, реализующую в виде списка представление многочлена P(x)=a_0+a_1*x+...+a_i*x^i, где а_i - вещественные числа, i - целые положительные числа, причем, если a_i=0, то соответствующий элемент-слагаемое должен отсутствовать в списке. Пользователь должен иметь возможность произвольно добавлять элементы-слагаемые через меню. Реализовать функцию сложения двух многочленов.\n");
+}
+
 void p_output(p_const *head)
 {
 	p_const *p=head;
-	//printf("P(x)=");
 	while(p)
 	{
 		printf("%0.1f*x^%Ld",p->count,p->num);
@@ -198,7 +202,6 @@ void p_sum(p_const *head1, p_const *head2)
 void main_menu()
 {
 	p_const *head1=NULL,*head2=NULL;
-	char choice='a';
 	bool h1=false,h2=false,d=true;
 	while (d)
 	{
@@ -243,35 +246,35 @@ void main_menu()
 		}
 		i++;
 		printf("%d) Выйти из программы\n",i);
-		scanf("\n%c",&choice);				
+		scanf("%d",&i);				
 		system("clear"); 
 		if ((!h1) && (!h2))
 		{
-			switch (choice)
+			switch (i)
 			{
-				case '0': printf("Написать программу, реализующую в виде списка представление многочлена P(x)=a_0+a_1*x+...+a_i*x^i, где а_i - вещественные числа, i - целые положительные числа, причем, если a_i=0, то соответствующий элемент-слагаемое должен отсутствовать в списке. Пользователь должен иметь возможность произвольно добавлять элементы-слагаемые через меню. Реализовать функцию сложения двух многочленов.\n");break;
-				case '1':
+				case 0: output_ex();break;
+				case 1:
 				{
 					head1=p_init(head1);
 					h1=true;
 				}break;
-				case '2': d=false;break;
+				case 2: d=false;break;
 			}
 		}
 		else
 		{
 			if ((h1) && (!h2))
 			{
-				switch (choice)
+				switch (i)
 				{
-					case '0': printf("Написать программу, реализующую в виде списка представление многочлена P(x)=a_0+a_1*x+...+a_i*x^i, где а_i - вещественные числа, i - целые положительные числа, причем, если a_i=0, то соответствующий элемент-слагаемое должен отсутствовать в списке. Пользователь должен иметь возможность произвольно добавлять элементы-слагаемые через меню. Реализовать функцию сложения двух многочленов\n");break;
-					case '1': 
+					case 0: output_ex();break;
+					case 1: 
 					{
 						printf("P(x)=");
 						p_output(head1);
 					}break;
-					case '2': head1=p_replace(head1);break;
-					case '3':
+					case 2: head1=p_replace(head1);break;
+					case 3:
 					{
 						printf("Введите значение X:");
 						double s;
@@ -280,26 +283,26 @@ void main_menu()
 						s=p_calc(head1,x);
 						printf("Значение P(x)=%f",s);
 					}break;
-					case '4':
+					case 4:
 					{
 						head2=p_init(head2);
 						h2=true;
 					}break;
-					case '5': d=false;break;
+					case 5: d=false;break;
 				}
 			}
 			else
 			{
-				switch (choice)
+				switch (i)
 				{
-					case '0': printf("Написать программу, реализующую в виде списка представление многочлена P(x)=a_0+a_1*x+...+a_i*x^i, где а_i - вещественные числа, i - целые положительные числа, причем, если a_i=0, то соответствующий элемент-слагаемое должен отсутствовать в списке. Пользователь должен иметь возможность произвольно добавлять элементы-слагаемые через меню. Реализовать функцию сложения двух многочленов.\n");break;
-					case '1': 
+					case 0: output_ex();break;
+					case 1: 
 					{
 						printf("P(x)=");
 						p_output(head1);
 					}break;
-					case '2': head1=p_replace(head1);break;
-					case '3':
+					case 2: head1=p_replace(head1);break;
+					case 3:
 					{
 						printf("Введите значение X:");
 						double s;
@@ -308,13 +311,13 @@ void main_menu()
 						s=p_calc(head1,x);
 						printf("P1(x)=%f\n",s);
 					}break;
-					case '4': 
+					case 4: 
 					{
 						printf("P(x)");
 						p_output(head2);
 					}break;
-					case '5': head2=p_replace(head2);break;
-					case '6':
+					case 5: head2=p_replace(head2);break;
+					case 6:
 					{
 						printf("Введите значение X:");
 						double s;
@@ -323,8 +326,8 @@ void main_menu()
 						s=p_calc(head2,x);
 						printf("P2(x)=%f\n",s);
 					}break;
-					case '7': p_sum(head1,head2);break;
-					case '8': d=false;break;
+					case 7: p_sum(head1,head2);break;
+					case 8: d=false;break;
 				}
 			}
 		}
@@ -335,7 +338,7 @@ void main_menu()
 
 int main()
 {
-	printf("Написать программу, реализующую в виде списка представление многочлена P(x)=a_0+a_1*x+...+a_i*x^i, где а_i - вещественные числа, i - целые положительные числа, причем, если a_i=0, то соответствующий элемент-слагаемое должен отсутствовать в списке. Пользователь должен иметь возможность произвольно добавлять элементы-слагаемые через меню. Реализовать функцию сложения двух многочленов.\n");
+	output_ex();
 	main_menu();
 	return 0;
 }
