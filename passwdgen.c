@@ -5,22 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void menu();
+
 void restart()
 {
 	printf("Do you want to generate another one?(y/n)");
 	char start;
 	scanf("\n%c",&start);
-	if (start=='y')
-	{
-		main();
-	}
-	else
-	{
-		exit;
-	}
+	if (start=='y')	menu();
 }
 
-void save(int n, char c[n])
+void save(int n, char *c)
 {
 	printf("\nDo you want to save it?(y/n) ");
 	char s,name[200];
@@ -29,7 +24,7 @@ void save(int n, char c[n])
 	if (s=='y')
 	{
 		printf("Enter file name: ");
-		scanf("\n%s",&name);
+		scanf("\n%s",name);
 		freopen(name,"w",stdout);
 		for (i=0; i<n; i++) {printf("%c",c[i]);}
 		fclose(stdout);
@@ -37,15 +32,10 @@ void save(int n, char c[n])
 	restart();
 }
 
-int main()
+void generator(char *c, int n)
 {
-	int n;
-	printf("Enter length of pass: ");
-	scanf("%d",&n);
 	srand(time(NULL));
-	char c[n];
 	int a,b,i;
-	printf("Here it is: ");
 	for (i=0; i<n; i++)
 	{
 		a=0+rand()%3;
@@ -56,8 +46,23 @@ int main()
 			case 2 : {b=0+rand()%26 + 65; c[i]=toupper((char)b);}; break;
 			default : break;
 		}
-		printf("%c",c[i]);
 	}
+	c[i]=0;
+}
+
+void menu()
+{
+	printf("Enter length of pass: ");
+	int n;
+	scanf("%d",&n);
+	char c[n];
+	generator(c,n);
+	printf("Here it is:\n%s",c);
 	save(n,c);
+}
+
+int main()
+{
+	menu();
 	return 0;
 }
