@@ -7,6 +7,14 @@
 
 void menu();
 
+void string_read(char *c)
+{
+	int i=0;
+	getchar();
+	while((c[i]=getchar())!='\n' && (c[i]!=EOF)) i++;
+	c[i]=0;
+}
+
 void restart()
 {
 	printf("Do you want to generate another one?(y/n)");
@@ -18,16 +26,17 @@ void restart()
 void save(int n, char *c)
 {
 	printf("\nDo you want to save it?(y/n) ");
-	char s,name[200];
-	int i;
+	char s;
 	scanf("\n%c",&s);
 	if (s=='y')
 	{
 		printf("Enter file name: ");
-		scanf("\n%s",name);
-		freopen(name,"w",stdout);
-		for (i=0; i<n; i++) {printf("%c",c[i]);}
-		fclose(stdout);
+		char name[200];
+		string_read(name);
+		FILE *f;
+		f=fopen(name,"w");
+		fprintf(f,"%s",c);
+		fclose(f);
 	}
 	restart();
 }
