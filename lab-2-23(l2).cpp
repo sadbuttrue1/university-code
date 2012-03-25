@@ -16,7 +16,7 @@ void output_ex()
 
 void p_output(p_const *head)
 {
-	p_const *p=head;
+	p_const * p=head;
 	while(p)
 	{
 		printf("%0.1f*x^%Ld",p->count,p->num);
