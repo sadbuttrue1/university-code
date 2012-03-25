@@ -6,12 +6,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-struct str_const
-{
-	char c;
-	str_const *next;
-};
-
 void menu();
 
 void string_read(char *c)
