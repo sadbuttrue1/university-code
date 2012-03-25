@@ -52,7 +52,7 @@ void restart()
 	if (start=='y')	menu();
 }
 
-void save(int n, str_const *str)
+void save(str_const *str)
 {
 	printf("\nDo you want to save it?(y/n):");
 	char s;
@@ -76,11 +76,11 @@ void save(int n, str_const *str)
 	restart();
 }
 
-void generator(int n, str_const *&str)
+void generator(unsigned long long int n, str_const *&str)
 {
 	srand(time(NULL));
-	int a,b,i;
-	for (i=0; i<n; i++)
+	int a,b;
+	for (unsigned long long int i=0; i<n; i++)
 	{
 		a=0+rand()%3;
 		str_const *p=new str_const;
@@ -99,13 +99,13 @@ void generator(int n, str_const *&str)
 void menu()
 {
 	printf("Enter length of pass: ");
-	int n;
-	scanf("%d",&n);
+	unsigned long long int n;
+	scanf("%Ld",&n);
 	str_const *str=NULL;
 	generator(n,str);
 	printf("Here it is:\n");
 	str_output(str);
-	save(n,str);
+	save(str);
 	str_delete(str);
 }
 
