@@ -48,7 +48,7 @@ p_const *p_init(p_const *head)
 	return head;
 }
 
-void p_delete(p_const *head)
+void p_delete(p_const *&head)
 {
 	p_const *p;
 	while (head != NULL)

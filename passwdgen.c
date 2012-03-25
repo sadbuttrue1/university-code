@@ -5,6 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct str_const
+{
+	char c;
+	str_const *next;
+};
+
 void menu();
 
 void string_read(char *c)
