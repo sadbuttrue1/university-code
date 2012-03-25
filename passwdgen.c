@@ -4,6 +4,7 @@
  
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 struct str_const
 {
@@ -23,7 +24,7 @@ void string_read(char *c)
 
 void restart()
 {
-	printf("Do you want to generate another one?(y/n)");
+	printf("Do you want to generate another one?(y/n):");
 	char start;
 	scanf("\n%c",&start);
 	if (start=='y')	menu();
@@ -31,7 +32,7 @@ void restart()
 
 void save(int n, char *c)
 {
-	printf("\nDo you want to save it?(y/n) ");
+	printf("\nDo you want to save it?(y/n):");
 	char s;
 	scanf("\n%c",&s);
 	if (s=='y')
@@ -58,7 +59,7 @@ void generator(char *c, int n)
 		{
 			case 0 : {b=0+rand()%10; c[i]=(char)(b+48);}; break;
 			case 1 : {b=0+rand()%26 + 97; c[i]=(char)b;}; break;
-			case 2 : {b=0+rand()%26 + 65; c[i]=toupper((char)b);}; break;
+			case 2 : {b=0+rand()%26 + 65; c[i]=(char)b;}; break;
 			default : break;
 		}
 	}
