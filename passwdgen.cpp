@@ -76,11 +76,11 @@ void save(str_const *str)
 	restart();
 }
 
-void generator(unsigned long long int n, str_const *&str)
+void generator(unsigned long long n, str_const *&str)
 {
 	srand(time(NULL));
 	int a,b;
-	for (unsigned long long int i=0; i<n; i++)
+	for (unsigned long long i=0; i<n; i++)
 	{
 		a=0+rand()%3;
 		str_const *p=new str_const;
@@ -99,7 +99,7 @@ void generator(unsigned long long int n, str_const *&str)
 void menu()
 {
 	printf("Enter length of pass: ");
-	unsigned long long int n;
+	unsigned long long n;
 	scanf("%Ld",&n);
 	str_const *str=NULL;
 	generator(n,str);
