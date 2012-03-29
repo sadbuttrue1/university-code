@@ -12,55 +12,97 @@ public:
 class CAsin: public CBaseFunc{
 private:
 	float carg;
+	float Count(){
+		return asin(carg)*180/PI;
+	}
 public:
-	void Print();
-	void Read();
-	CAsin(const float &arg);
+	void Print(){
+	printf("Значение arcsin(%f)=%f",carg,Count());
+}
+	void Read(){
+		scanf("%f",&carg);
+	}
+	CAsin (){}
+	CAsin(const float &arg){
+		carg=arg;
+	}
 };
 
-CAsin::CAsin(const float &arg){
-	carg=arg;
-}
+class CAcos: public CBaseFunc{
+private:
+	float carg;
+	float Count(){
+		return acos(carg)*180/PI;
+	}
+public:
+	void Print(){
+		printf("Значение arccos(%f)=%f",carg,Count());
+	}
+	void Read(){
+		scanf("%f",&carg);
+	}
+	CAcos(){}
+	CAcos(const float &arg){
+		carg=arg;
+	}
+};
 
-void CAsin::Print(){
-	printf("Значение arcsin(%f)=%f",carg,asin(carg)*180/PI);
-}
-
-void CAsin::Read(){}
+class CDer: public CBaseFunc{
+private:
+	bool ctype;
+	float carg;
+	float csum;
+	float Count(){
+		return csum/sqrt(1-carg*carg);
+	}
+public:
+	void Print(){
+		if (ctype) printf("Значение (arcsin(%f))'=%f/sqrt(1-%f^2)=%f",carg,csum,carg,Count());
+		else printf("Значение (arccos(%f))'=%f/sqrt(1-%f^2)=%f",carg,csum,carg,Count());
+	}
+	void Read(){
+		scanf("%f",&carg);
+	}
+	CDer(){}
+	CDer(const bool &type){
+		if (type) csum=1;
+		else csum=-1;
+	}//передаем true, если производная от arcsin, и false, если производная от arccos.
+	CDer(const bool &type, const float &arg){
+		if (type) csum=1;
+		else csum=-1;
+		carg=arg;
+	}
+};
 
 void delete_CBaseFunc(CBaseFunc **p){
 	if (*p!=NULL) delete *p;
 	*p=NULL;
 }
 
-class CAcos: public CBaseFunc{
-private:
-	float carg;
-public:
-	void Print();
-	void Read();
-	CAcos(const float &arg);
-};
-
-CAcos::CAcos(const float &arg){
-	carg=arg;
-}
-
-void CAcos::Print(){
-	printf("Значение arcsin(%f)=%f",carg,acos(carg)*180/PI);
-}
-
-void CAcos::Read(){}
-
 int main(){
-	float x;
-	scanf("%f",&x);
+	/*CAcos c;
+	c.Read();
+	c.Print();*/
 	CBaseFunc *c=NULL;
-	c=new CAsin(x);
+	c=new CAsin();
+	c->Read();
 	c->Print();
 	delete_CBaseFunc(&c);
-	c=new CAcos(x);
+	c=new CAcos();
+	printf("\n");
+	c->Read();
 	c->Print();	
+	delete_CBaseFunc(&c);
+	c=new CDer(true);
+	printf("\n");
+	c->Read();
+	c->Print();
+	delete_CBaseFunc(&c);
+	c=new CDer(false);
+	printf("\n");
+	c->Read();
+	c->Print();
 	delete_CBaseFunc(&c);
 	return 0;
 }
