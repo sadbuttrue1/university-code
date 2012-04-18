@@ -11,7 +11,8 @@ public:
 	virtual double Calc(double x) =0;
 	virtual double Count_a() =0;
 	virtual double Count_k() =0;
-	virtual bool is_it_Der() =0;
+	virtual bool have_Der() =0;
+	virtual bool correct_variable(double x) =0;
 	virtual ~CBaseFunc(){}
 };
 
@@ -39,12 +40,16 @@ public:
 	double Count_a(){
 		return a;
 	}
-	bool is_it_Der(){
-		return true;
+	bool have_Der(){
+		return false;
 	}
 	CDer(const CDer &copy){
 		k=copy.k;
 		a=copy.a;
+	}
+	bool correct_variable(double x){
+		if ((a*a*x*x>-1) && (a*a*x*x<1)) return true;
+		else return false;
 	}
 };
 
@@ -77,8 +82,12 @@ public:
 	double Count_a(){
 		return a;
 	}
-	bool is_it_Der(){
-		return false;
+	bool have_Der(){
+		return true;
+	}
+	bool correct_variable(double x){
+		if ((a*x>-1) && (a*x<1)) return true;
+		else return false;
 	}
 };
 
@@ -111,8 +120,12 @@ public:
 	double Count_a(){
 		return a;
 	}
-	bool is_it_Der(){
-		return false;
+	bool have_Der(){
+		return true;
+	}
+	bool correct_variable(double x){
+		if ((a*x>-1) && (a*x<1)) return true;
+		else return false;
 	}
 };
 
@@ -158,7 +171,7 @@ void main_menu(){
 				printf("%d) k*arcsin(a*x).\n",n);
 				n++;
 				printf("%d) k*arccos(a*x).\n",n);
-				if ((foo) && (!foo->is_it_Der())){
+				if ((foo) && (foo->have_Der())){
 					n++;
 					printf("%d) производная текущей функции.\n",n);
 				}
@@ -182,7 +195,7 @@ void main_menu(){
 							ex_der=false;
 							sin=false;
 						};break;
-					if ((foo) && (!foo->is_it_Der())){
+					if ((foo) && (foo->have_Der())){
 						case 2:{
 							CBaseFunc *der;
 							der=foo->Der();
