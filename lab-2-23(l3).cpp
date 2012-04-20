@@ -2,17 +2,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define PI 3.14159265
-
 class CBaseFunc{
 public:
 	virtual void Print() =0;
 	virtual CBaseFunc *Der() =0;
 	virtual double Calc(double x) =0;
-	virtual double Count_a() =0;
-	virtual double Count_k() =0;
 	virtual bool have_Der() =0;
 	virtual bool correct_variable(double x) =0;
+	virtual void variable_range() =0;
 	virtual ~CBaseFunc(){}
 };
 
@@ -20,25 +17,24 @@ class CDer:public CBaseFunc{
 private:
 	double k;
 	double a;
+	char type;
 public:
 	void Print(){
-		printf("%f*%f/sqrt(1-%f*x^2)\n",k,a,a*a);
+		if (type=='c') printf("-");
+		printf("%lf/sqrt(1-%lf*x^2)",k*a,a*a);
 	}
 	double Calc(double x){
-		return k*a/sqrt(1-a*a*x);
+		int s=1;
+		if (type=='c') s=-1;
+		return s*k*a/sqrt(1-a*a*x);
 	}
 	CBaseFunc *Der(){
 		return NULL;
 	}
-	CDer(const double &k,const double &a){
+	CDer(const double &k,const double &a, const char &type){
 		this->k=k;
 		this->a=a;
-	}
-	double Count_k(){
-		return k;
-	}
-	double Count_a(){
-		return a;
+		this->type=type;
 	}
 	bool have_Der(){
 		return false;
@@ -46,10 +42,14 @@ public:
 	CDer(const CDer &copy){
 		k=copy.k;
 		a=copy.a;
+		type=copy.type;
 	}
 	bool correct_variable(double x){
 		if ((a*a*x*x>-1) && (a*a*x*x<1)) return true;
 		else return false;
+	}
+	void variable_range(){
+		printf("|%lf * x^2|<1",a*a);
 	}
 };
 
@@ -59,11 +59,11 @@ private:
 	double a;
 public:
 	CBaseFunc *Der(){
-		CBaseFunc *res=new CDer(k,a);
+		CBaseFunc *res=new CDer(k,a,'s');
 		return res;
 	}
 	void Print(){
-		printf("%f*arcsin(%f*x)\n",k,a);
+		printf("%lf*arcsin(%lf*x)",k,a);
 	}
 	double Calc(double x){
 		return k*asin(a*x);
@@ -76,18 +76,15 @@ public:
 		k=copy.k;
 		a=copy.a;
 	}
-	double Count_k(){
-		return k;
-	}
-	double Count_a(){
-		return a;
-	}
 	bool have_Der(){
 		return true;
 	}
 	bool correct_variable(double x){
-		if ((a*x>-1) && (a*x<1)) return true;
+		if ((a*x>=-1) && (a*x<=1)) return true;
 		else return false;
+	}
+	void variable_range(){
+		printf("|%lf * x|<=1",a);
 	}
 };
 
@@ -97,11 +94,11 @@ private:
 	double a;
 public:
 	CBaseFunc *Der(){
-		CBaseFunc *res=new CDer(k,a);
+		CBaseFunc *res=new CDer(k,a,'c');
 		return res;
 	}
 	void Print(){
-		printf("%f*arccos(%f*x)\n",k,a);
+		printf("%lf*arccos(%lf*x)",k,a);
 	}
 	double Calc(double x){
 		return k*acos(a*x);
@@ -114,18 +111,15 @@ public:
 		k=copy.k;
 		a=copy.a;
 	}
-	double Count_k(){
-		return k;
-	}
-	double Count_a(){
-		return a;
-	}
 	bool have_Der(){
 		return true;
 	}
 	bool correct_variable(double x){
 		if ((a*x>-1) && (a*x<1)) return true;
 		else return false;
+	}
+	void variable_range(){
+		printf("|%lf * x|<=1",a);
 	}
 };
 
@@ -140,112 +134,86 @@ void output_ex(){
 
 void main_menu(){
 	CBaseFunc *foo=NULL;
-	bool ex=false;
-	bool ex_der,sin;
+	bool exit=false;
 	int i=0;
-	while (!ex){
+	while (!exit){
 		i=0;
-		printf("\nМеню программы (для выбора действия введите номер и нажмите Enter:\n");
+		printf("\nМеню программы (для выбора действия введите номер и нажмите Return:\n");
 		printf("%d) Вывести задание.\n",i);
-		if (!foo){
-			i++;
-			printf("%d) Выбрать функцию.\n",i);
-		}
-		else{
-			i++;
-			printf("%d) Переопределить функцию.\n",i);
-			i++;
-			printf("%d) Вывести текущую функцию.\n",i);
-			i++;
-			printf("%d) Посчитать текущую функцию для заданного X.\n",i);
-		}
+		i++;
+		printf("%d) Выбрать функцию.\n",i);
+		i++;
+		printf("%d) Вывести текущую функцию.\n",i);
+		i++;
+		printf("%d) Вычислить текущую функцию для заданного X.\n",i);
 		i++;
 		printf("%d) Выйти из программы.\n",i);
 		scanf("%d",&i);
 		system("clear");
 		switch (i){
 			case 0: output_ex();break;
-			case 1:{
-				printf("Введите номер функции.\n");
+			case 1: {
+				printf("Введите номер функции и нажмите Return.\n");
 				int n=0;
 				printf("%d) k*arcsin(a*x).\n",n);
 				n++;
 				printf("%d) k*arccos(a*x).\n",n);
-				if ((foo) && (foo->have_Der())){
-					n++;
-					printf("%d) производная текущей функции.\n",n);
-				}
+				n++;
+				printf("%d) производная текущей функции.\n",n);
 				scanf("%d",&n);
 				switch (n){
 					case 0:{
 						if (foo) delete_CBaseFunc(&foo);
-							printf("Введите коэффициенты k и a через пробел.\n");
-							double a,k;
-							scanf("%lf %lf",&k,&a);
-							foo=new CAsin(k,a);
-							ex_der=false;
-							sin=true;
-						};break;
+						printf("Введите коэффициенты k и a через пробел.\n");
+						double k,a;
+						scanf("%lf %lf",&k,&a);
+						foo=new CAsin(k,a);
+					};break;
 					case 1:{
 						if (foo) delete_CBaseFunc(&foo);
-							printf("Введите коэффициенты k и a через пробел.\n");
-							double a,k;
-							scanf("%lf %lf",&k,&a);
-							foo=new CAcos(k,a);
-							ex_der=false;
-							sin=false;
-						};break;
-					if ((foo) && (foo->have_Der())){
-						case 2:{
-							CBaseFunc *der;
-							der=foo->Der();
-							delete_CBaseFunc(&foo);
-							foo=der;
-							der=NULL;
-							ex_der=true;
-						};break;
-					}
+						printf("Введите коэффициенты k и a через пробел.\n");
+						double k,a;
+						scanf("%lf %lf",&k,&a);
+						foo=new CAcos(k,a);
+					};break;
+					case 2:{
+						if (foo){
+							if (foo->have_Der()){
+								CBaseFunc *der;
+								der=foo->Der();
+								delete_CBaseFunc(&foo);
+								foo=der;
+								der=NULL;
+							}
+							else printf("Для функции не определена производная.\n");
+						}
+						else printf("Не выбрана функция.\n");
+					};break;
 				}
 			};break;
 			case 2:{
 				if (foo){
-					if ((ex_der) && (!sin)) printf("-");
 					foo->Print();
+					printf("\n");
 				}
-				else ex=true;
-				};break;
-			case 3:if (foo){
-				if (!ex_der){
-					double x;
-					printf("Введите X (|%lf * x| <=1).\n",foo->Count_a());
-					scanf("%lf",&x);
-					while ((foo->Count_a()*x>1) || (foo->Count_a()*x<-1)){
-						printf("(|%lf * x| <=1) Введите верное значение.\n",foo->Count_a());
-						scanf("%lf",&x);
-					}
-					printf("Выражение ");
-					foo->Print();
-					printf("\n равно %lf для %lf",foo->Calc(x)*180/PI,x);
-				}
-				else{
-					double x;
-					printf("Введите X (|%lf * x^2| <1).\n",foo->Count_a()*foo->Count_a());
-					scanf("%lf",&x);
-					while ((foo->Count_a()*foo->Count_a()*x*x>=1) || (foo->Count_a()*foo->Count_a()*x*x<=-1)){
-						printf("(|%lf * x| <1) Введите верное значение.\n",foo->Count_a());
-						scanf("%lf",&x);
-					}
-					printf("Выражение ");
-					int s=1;
-					if (!sin){
-						printf("-");
-						s=-1;
-					}
-					foo->Print();
-					printf("\n равно %lf для %lf",s*foo->Calc(x),x);
-				}
+				else printf("Не выбрана функция.\n");
 			};break;
-			case 4:if (foo) ex=true;break;
+			case 3:{
+				if (foo){
+					printf("Введите X.\n");
+					double x;
+					scanf("%lf",&x);
+					while(!foo->correct_variable(x)){
+						foo->variable_range();
+						printf("\nВведите корректное значение.\n");
+						scanf("%lf",&x);
+					}
+					foo->Print();
+					printf("=%lf\n",foo->Calc(x));
+				}
+				else printf("Не выбрана функция.\n");
+			};break;
+			case 4: exit=true;break;
 		}
 	}
 	delete_CBaseFunc(&foo);
