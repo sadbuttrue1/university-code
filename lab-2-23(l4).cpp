@@ -1,0 +1,429 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+class CBaseFunc{
+public:
+	virtual void Print() =0;
+	virtual CBaseFunc *Der() =0;
+	virtual double Calc(double x) =0;
+	virtual bool have_Der() =0;
+	virtual bool correct_variable(double x) =0;
+	virtual void variable_range() =0;
+	virtual ~CBaseFunc(){}
+};
+
+class CDer:public CBaseFunc{
+private:
+	double k;
+	double a;
+	char type;
+public:
+	void Print(){
+		if (type=='c') printf("-");
+		printf("%lf/sqrt(1-%lf*x^2)",k*a,a*a);
+	}
+	double Calc(double x){
+		int s=1;
+		if (type=='c') s=-1;
+		return s*k*a/sqrt(1-a*a*x);
+	}
+	CBaseFunc *Der(){
+		return NULL;
+	}
+	CDer(const double &k,const double &a, const char &type){
+		this->k=k;
+		this->a=a;
+		this->type=type;
+	}
+	bool have_Der(){
+		return false;
+	}
+	CDer(const CDer &copy){
+		k=copy.k;
+		a=copy.a;
+		type=copy.type;
+	}
+	bool correct_variable(double x){
+		if ((a*a*x*x>-1) && (a*a*x*x<1)) return true;
+		else return false;
+	}
+	void variable_range(){
+		printf("|%lf * x^2|<1",a*a);
+	}
+	bool operator == (const CDer &src){
+		if ((this) && (&src)){
+			if ((k==(&src)->k) && (a==(&src)->a) && (type==(&src)->type)) return true;
+			else return false;
+		}
+	}
+	bool operator != (const CDer &src){
+		return !( this == (&src));
+	}
+	CDer& operator = (const CDer &src){
+		if (!(this == (&src))){
+			k=(&src)->k;
+			a=(&src)->a;
+			type=(&src)->type;
+		}
+		return *this;
+	}
+};
+
+class CAsin: public CBaseFunc{
+private:
+	double k;
+	double a;
+public:
+	CBaseFunc *Der(){
+		CBaseFunc *res=new CDer(k,a,'s');
+		return res;
+	}
+	void Print(){
+		printf("%lf*arcsin(%lf*x)",k,a);
+	}
+	double Calc(double x){
+		return k*asin(a*x);
+	}
+	CAsin(const double &k, const double &a){
+		this->k=k;
+		this->a=a;
+	}
+	CAsin(const CAsin &copy){
+		k=copy.k;
+		a=copy.a;
+	}
+	bool have_Der(){
+		return true;
+	}
+	bool correct_variable(double x){
+		if ((a*x>=-1) && (a*x<=1)) return true;
+		else return false;
+	}
+	void variable_range(){
+		printf("|%lf * x|<=1",a);
+	}
+	bool operator == (const CAsin &src){
+		if ((this) && (&src)){
+			if ((k==(&src)->k) && (a==(&src)->a)) return true;
+			else return false;
+		}
+	}
+	bool operator != (const CAsin &src){
+		return !( this == (&src));
+	}
+	CAsin& operator = (const CAsin &src){
+		if (!(this == (&src))){
+			k=(&src)->k;
+			a=(&src)->a;
+		}
+		return *this;
+	}
+};
+
+class CAcos:public CBaseFunc{
+private:
+	double k;
+	double a;
+public:
+	CBaseFunc *Der(){
+		CBaseFunc *res=new CDer(k,a,'c');
+		return res;
+	}
+	void Print(){
+		printf("%lf*arccos(%lf*x)",k,a);
+	}
+	double Calc(double x){
+		return k*acos(a*x);
+	}
+	CAcos(const double &k, const double &a){
+		this->k=k;
+		this->a=a;
+	}
+	CAcos(const CAcos &copy){
+		k=copy.k;
+		a=copy.a;
+	}
+	bool have_Der(){
+		return true;
+	}
+	bool correct_variable(double x){
+		if ((a*x>-1) && (a*x<1)) return true;
+		else return false;
+	}
+	void variable_range(){
+		printf("|%lf * x|<=1",a);
+	}
+	bool operator == (const CAcos &src){
+		if ((this) && (&src)){
+			if ((k==(&src)->k) && (a==(&src)->a)) return true;
+			else return false;
+		}
+	}
+	bool operator != (const CAcos &src){
+		return !( this == (&src));
+	}
+	CAcos& operator = (const CAcos &src){
+		if (!(this == (&src))){
+			k=(&src)->k;
+			a=(&src)->a;
+		}
+		return *this;
+	}
+};
+
+class CFuncs{
+private:
+	CBaseFunc ** c_funcs;
+	int count;
+public:
+	class iterator{
+		private:
+			int current;
+			CFuncs *collection;
+		public:
+			iterator* operator ++(int n){
+				current++;
+				return this;
+			}
+			iterator* operator +=(int n){
+				if ((current+n<0) || (current+n>=collection->count));//exeption
+				else current+=n;
+				return this;
+			}
+			bool end(){
+				if (current==collection->count) return true;
+				else return false;
+			}
+			int number(){
+				return current;
+			}
+			CBaseFunc*& element(){
+				return collection->c_funcs[current];
+			}
+			friend CFuncs;
+		};
+	iterator begin(){
+		iterator i;
+		i.current=0;
+		i.collection=this;
+		return i;
+	}
+	CFuncs(const int func_cnt=0){
+		count = func_cnt;
+		c_funcs = new CBaseFunc*[count];
+		for (iterator i=this->begin(); !(i.end()); i++)
+			i.element()=NULL;
+	}
+	~CFuncs(){
+		for (int i=0; i<count; i++)
+			if (c_funcs[i] != NULL) delete c_funcs[i];
+		delete [] c_funcs;
+	}
+	CFuncs* truncation(int n){
+		if ((n<0) || (n>=count)) return this;//exeption
+		else{
+			CFuncs *new_f = new CFuncs(n+1);
+			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end()); it1++, it2++){
+				it1.element()=it2.element();
+				it2.element()=NULL;
+			}
+			delete(this);
+			return new_f;
+		}
+	}
+	CFuncs* insertion(int n){
+		if ((n<0) || (n>=count+1)) return this;//exeption
+		else{
+			CFuncs *new_f = new CFuncs(count+1);
+			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end()); it1++){
+				if (it1.number()==n+1){
+					it1.element()=NULL;
+				}
+				else{
+					it1.element()=it2.element();
+					it2.element()=NULL;
+					it2++;
+				}
+			}
+			delete(this);
+			return new_f;
+		}
+	}
+	CFuncs* deletion(int n){
+		if ((n<0) || (n>=count)) return this;//exeption
+		else{
+			CFuncs *new_f = new CFuncs(count-1);
+			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end());it1++){
+				if (it2.number()==n) it2++;
+				it1.element()=it2.element();
+				it2.element()=NULL;
+				it2++;
+			}
+			delete(this);
+			return new_f;
+		}
+	}
+	/*CBaseFunc* operator[] (const CFuncs::iterator n) const{
+		CFuncs::iterator res=n;
+		return res.element();
+	}*/
+	/*CBaseFunc*& operator[] (const CFuncs::iterator &n){
+		CFuncs::iterator res=n;
+		return res.element();
+	}*/
+//	CBaseFunc*& operator [] (iterator n);
+	
+};
+
+void delete_CBaseFunc(CBaseFunc **p){
+	if (*p) delete *p;
+	*p=NULL;
+}
+
+void delete_CFuncs(CFuncs **p){
+	if (*p) delete *p;
+	*p=NULL;
+}
+
+void output_ex(){
+	printf("напиши задание!\n");
+}
+
+void main_menu(){
+	bool exit=false;
+	CFuncs *x=NULL;
+	while (!exit){
+		int i=0;
+		printf("\nМеню программы (для выбора действия введите номер и нажмите Return):\n");
+		printf("%d) Вывести задание.\n",i);
+		i++;
+		printf("%d) Создать пустую коллекцию.\n",i);
+		i++;
+		printf("%d) Перейти к работе с элементами коллекции.\n",i);
+		i++;
+		printf("%d) Выйти из программы.\n",i);
+		scanf("%d",&i);
+		system("clear");
+		switch(i){
+			case 0: output_ex(); break;
+			case 1:{
+				if (x){
+					printf("Хотите уничтожить существующую коллекцию и создать новую? (y/n):");
+					char c;
+					scanf("\n%c",&c);
+					if (c=='n') break;
+				}
+				printf("Введите размер коллекции:");
+				int n;
+				scanf("%d",&n);
+				x= new CFuncs(n);
+			};break;
+			case 2:{
+				if (!x) ;//exeption about no collection
+				else{
+					int k=0;
+					printf("%d) Вывести существующие элементы коллекции.\n",k);
+					k++;
+					printf("%d) Задать элемент с номером.\n",k);
+					k++;
+					printf("%d) Удалить элементы после выбранного.\n",k);
+					k++;
+					printf("%d) Вставить пустой элемент на заданное место.\n",k);
+					k++;
+					printf("%d) Вставить пустой элемент в конец.\n",k);
+					k++;
+					printf("%d) Удалить элемент коллекции.\n",k);
+					scanf("%d",&k);
+					system("clear");
+					switch(k){
+						case 0:{
+							for (CFuncs::iterator it=x->begin(); !(it.end()); it++)
+							if (it.element()){
+								printf("%d)",it.number());
+								it.element()->Print();
+								printf("\n");
+							}
+						};break;
+						case 1:{
+							printf("Введите номер элемента коллекции, которых хотите задать или переопределить:");
+							int n;
+							scanf("%d",&n);
+							CFuncs::iterator it=x->begin();
+							it+=n;
+							system("clear");
+							printf("Введите номер функции и нажмите Return.\n");
+							n=0;
+							printf("%d) k*arcsin(a*x).\n",n);
+							n++;
+							printf("%d) k*arccos(a*x).\n",n);
+							n++;
+							printf("%d) Производная текущей функции.\n",n);
+							scanf("%d",&n);
+							switch (n){
+								case 0:{
+									if (it.element()) delete_CBaseFunc(&it.element());
+									printf("Введите коэффициенты k и a через пробел.\n");
+									double k,a;
+									scanf("%lf %lf",&k,&a);
+									it.element()=new CAsin(k,a);
+								};break;
+								case 1:{
+									if (it.element()) delete_CBaseFunc(&it.element());
+									printf("Введите коэффициенты k и a через пробел.\n");
+									double k,a;
+									scanf("%lf %lf",&k,&a);
+									it.element()=new CAcos(k,a);
+								};break;
+								case 2:{
+									if (it.element()){
+										if (it.element()->have_Der()){
+											CBaseFunc *der;
+											der=it.element()->Der();
+											delete_CBaseFunc(&it.element());
+											it.element()=der;
+											der=NULL;
+										}
+										else printf("Для функции не определена производная.\n");//exeption no der
+									}
+									else printf("Не выбрана функция.\n");//exeption no func
+								};break;
+							}
+						};break;
+						case 2:{
+							printf("Введите номер элемента, после которого нужно удалить элементы:");
+							int n;
+							scanf("%d",&n);
+							x=x->truncation(n);
+						};break;
+						case 3:{
+							printf("Введите номер элемента, после которого нужно вставить пустой элемент:");
+							int n;
+							scanf("%d",&n);
+							x=x->insertion(n);
+						};break;
+						case 4:{
+							CFuncs::iterator it;
+							for (it=x->begin(); !(it.end()); it++);
+							x=x->insertion(it.number()-1);
+						};break;
+						case 5:{
+							printf("Введите номер элемента, который нужно удалить:");
+							int n;
+							scanf("%d",&n);
+							x=x->deletion(n);
+						};break;
+					}
+				}
+			};break;
+			case 3:exit=true;break;
+		}
+	}
+	delete_CFuncs(&x);
+}
+
+int main(){
+	output_ex();
+	main_menu();
+	return 0;
+}
