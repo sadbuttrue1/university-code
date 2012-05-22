@@ -217,7 +217,10 @@ public:
 				return this;
 			}
 			iterator* operator +=(int n){
-				if ((current+n<0) || (current+n>=collection->count)){ Exeption err(0,n); throw(err);}//exeption
+				if ((current+n<0) || (current+n>=collection->count)){
+					Exeption err(0,n);
+					throw(err);
+					}//exeption
 				else current+=n;
 				return this;
 			}
@@ -251,7 +254,11 @@ public:
 		delete [] c_funcs;
 	}
 	CFuncs* truncation(int n){
-		if ((n<0) || (n>=count)) { Exeption err(0,n); throw(err); return this;}//exeption
+		if ((n<0) || (n>=count)){
+			Exeption err(0,n);
+			throw(err);
+			return this;
+			}//exeption
 		else{
 			CFuncs *new_f = new CFuncs(n+1);
 			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end()); it1++, it2++){
@@ -263,7 +270,11 @@ public:
 		}
 	}
 	CFuncs* insertion(int n){
-		if ((n<0) || (n>=count+1)) { Exeption err(0,n); throw(err); return this;}//exeption
+		if ((n<0) || (n>=count+1)){
+			Exeption err(0,n);
+			throw(err);
+			return this;
+			}//exeption
 		else{
 			CFuncs *new_f = new CFuncs(count+1);
 			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end()); it1++){
@@ -281,7 +292,11 @@ public:
 		}
 	}
 	CFuncs* deletion(int n){
-		if ((n<0) || (n>=count)) { Exeption err(0,n); throw(err); return this;}//exeption
+		if ((n<0) || (n>=count)){
+			Exeption err(0,n);
+			throw(err);
+			return this;
+			}//exeption
 		else{
 			CFuncs *new_f = new CFuncs(count-1);
 			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end());it1++){
@@ -294,14 +309,14 @@ public:
 			return new_f;
 		}
 	}
-	/*CBaseFunc* operator[] (const CFuncs::iterator n) const{
-		CFuncs::iterator res=n;
-		return res.element();
-	}*/
-	/*CBaseFunc*& operator[] (iterator n){
+	CBaseFunc* operator[] (int n) const{
 		//CFuncs::iterator res=n;
-		return n.element();
-	}*/
+		return c_funcs[n];
+	}
+	CBaseFunc*& operator[] (iterator n){
+		//CFuncs::iterator res=n;
+		return c_funcs[n.number()];
+	}
 //	CBaseFunc*& operator [] (iterator n);
 	friend class CFuncs::iterator;
 };
@@ -351,7 +366,10 @@ void main_menu(){
 					x= new CFuncs(n);
 				};break;
 				case 2:{
-					if (!x) { Exeption err(1); throw(err);}//exeption about no collection
+					if (!x){
+						Exeption err(1);
+						throw(err);
+						}//exeption about no collection
 					else{
 						int k=0;
 						printf("%d) Вывести существующие элементы коллекции.\n",k);
@@ -372,9 +390,9 @@ void main_menu(){
 						switch(k){
 							case 0:{
 								for (CFuncs::iterator it=x->begin(); !(it.end()); it++)
-									if (it.element()){
+									if ((*x)[it]){
 										printf("%d)",it.number());
-										it.element()->Print();
+										(*x)[it]->Print();
 										printf("\n");
 									}
 							};break;
@@ -395,31 +413,37 @@ void main_menu(){
 								scanf("%d",&n);
 								switch (n){
 									case 0:{
-										if (it.element()) delete_CBaseFunc(&it.element());
+										if ((*x)[it]) delete_CBaseFunc(&(*x)[it]);
 										printf("Введите коэффициенты k и a через пробел.\n");
 										double k,a;
 										scanf("%lf %lf",&k,&a);
-										it.element()=new CAsin(k,a);
+										(*x)[it]=new CAsin(k,a);
 									};break;
 									case 1:{
-										if (it.element()) delete_CBaseFunc(&it.element());
+										if ((*x)[it]) delete_CBaseFunc(&(*x)[it]);
 										printf("Введите коэффициенты k и a через пробел.\n");
 										double k,a;
 										scanf("%lf %lf",&k,&a);
-										it.element()=new CAcos(k,a);
+										(*x)[it]=new CAcos(k,a);
 									};break;
 									case 2:{
-										if (it.element()){
-											if (it.element()->have_Der()){
+										if ((*x)[it]){
+											if ((*x)[it]->have_Der()){
 												CBaseFunc *der;
-												der=it.element()->Der();
-												delete_CBaseFunc(&it.element());
-												it.element()=der;
+												der=(*x)[it]->Der();
+												delete_CBaseFunc(&(*x)[it]);
+												(*x)[it]=der;
 												der=NULL;
 											}
-											else { Exeption err(2); throw(err);}//exeption no der
+											else{
+												Exeption err(2);
+												throw(err);
+												}//exeption no der
 										}
-										else { Exeption err(3); throw(err);}//exeption no func
+										else{
+											Exeption err(3);
+											throw(err);
+											}//exeption no func
 									};break;
 								}
 							};break;
@@ -452,17 +476,24 @@ void main_menu(){
 								scanf("%d",&n);
 								CFuncs::iterator it=x->begin();
 								it+=n;
-								if (it.element()){
+								if ((*x)[it]){
 									printf("Введите X.\n");
-									double x;
-									scanf("%lf",&x);
-									if (it.element()->correct_variable(x)){
-										it.element()->Print();
-										printf("=%lf\n",it.element()->Calc(x));
+									double y;
+									scanf("%lf",&y);
+									if ((*x)[it]->correct_variable(y)){
+										(*x)[it]->Print();
+										printf("=%lf\n",(*x)[it]->Calc(y));
 									}
-									else { Exeption err(4,x); throw(err); it.element()->variable_range();}//exeption wrong var
+									else{
+										Exeption err(4,y);
+										throw(err);
+										(*x)[it]->variable_range();
+										}//exeption wrong var
 								}
-								else { Exeption err(3); throw(err);}//exeption no func
+								else{
+									Exeption err(3);
+									throw(err);
+									}//exeption no func
 							};break;
 						}
 					}
