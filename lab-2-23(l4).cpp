@@ -174,16 +174,17 @@ public:
 
 class Exeption{
 private:
-	int type,count;
+	int type;
+	double count;
 public:
-	Exeption(const int type, const int  count=0){
+	Exeption(const int type, const double count=0){
 		this->type=type;
 		this->count=count;
 	}
 	void Print(){
 		switch(type){
 			case 0:{
-				printf("Введенный индекс %d приводит к выходу за границы коллекции.\n",count);
+				printf("Введенный индекс %lf приводит к выходу за границы коллекции.\n",count);
 			};break;
 			case 1:{
 				printf("Не создана коллекция.\n");
@@ -193,6 +194,9 @@ public:
 			};break;
 			case 3:{
 				printf("Не определена функция.\n");
+			};break;
+			case 4:{
+				printf("Не существует значения функции для %lf.\n",count);
 			};break;
 		}
 	}
@@ -361,6 +365,8 @@ void main_menu(){
 						printf("%d) Вставить пустой элемент в конец.\n",k);
 						k++;
 						printf("%d) Удалить элемент коллекции.\n",k);
+						k++;
+						printf("%d) Вычислить элемент коллекции для заданного значения переменной.\n",k);
 						scanf("%d",&k);
 						system("clear");
 						switch(k){
@@ -439,6 +445,24 @@ void main_menu(){
 								int n;
 								scanf("%d",&n);
 								x=x->deletion(n);
+							};break;
+							case 6:{
+								printf("Введите номер элемента, который хотите вычислить:");
+								int n;
+								scanf("%d",&n);
+								CFuncs::iterator it=x->begin();
+								it+=n;
+								if (it.element()){
+									printf("Введите X.\n");
+									double x;
+									scanf("%lf",&x);
+									if (it.element()->correct_variable(x)){
+										it.element()->Print();
+										printf("=%lf\n",it.element()->Calc(x));
+									}
+									else { Exeption err(4,x); throw(err); it.element()->variable_range();}//exeption wrong var
+								}
+								else { Exeption err(3); throw(err);}//exeption no func
 							};break;
 						}
 					}
