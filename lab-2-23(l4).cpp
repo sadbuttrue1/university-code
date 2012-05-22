@@ -172,9 +172,35 @@ public:
 	}
 };
 
+class Exeption{
+private:
+	int type,count;
+public:
+	Exeption(const int type, const int  count=0){
+		this->type=type;
+		this->count=count;
+	}
+	void Print(){
+		switch(type){
+			case 0:{
+				printf("Введенный индекс %d приводит к выходу за границы коллекции.\n",count);
+			};break;
+			case 1:{
+				printf("Не создана коллекция.\n");
+			};break;
+			case 2:{
+				printf("Для функции не определена производная.\n");
+			};break;
+			case 3:{
+				printf("Не определена функция.\n");
+			};break;
+		}
+	}
+};
+
 class CFuncs{
 private:
-	CBaseFunc ** c_funcs;
+	CBaseFunc** c_funcs;
 	int count;
 public:
 	class iterator{
@@ -187,7 +213,7 @@ public:
 				return this;
 			}
 			iterator* operator +=(int n){
-				if ((current+n<0) || (current+n>=collection->count));//exeption
+				if ((current+n<0) || (current+n>=collection->count)){ Exeption err(0,n); throw(err);}//exeption
 				else current+=n;
 				return this;
 			}
@@ -201,7 +227,7 @@ public:
 			CBaseFunc*& element(){
 				return collection->c_funcs[current];
 			}
-			friend CFuncs;
+			friend class CFuncs;
 		};
 	iterator begin(){
 		iterator i;
@@ -221,7 +247,7 @@ public:
 		delete [] c_funcs;
 	}
 	CFuncs* truncation(int n){
-		if ((n<0) || (n>=count)) return this;//exeption
+		if ((n<0) || (n>=count)) { Exeption err(0,n); throw(err); return this;}//exeption
 		else{
 			CFuncs *new_f = new CFuncs(n+1);
 			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end()); it1++, it2++){
@@ -233,7 +259,7 @@ public:
 		}
 	}
 	CFuncs* insertion(int n){
-		if ((n<0) || (n>=count+1)) return this;//exeption
+		if ((n<0) || (n>=count+1)) { Exeption err(0,n); throw(err); return this;}//exeption
 		else{
 			CFuncs *new_f = new CFuncs(count+1);
 			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end()); it1++){
@@ -251,7 +277,7 @@ public:
 		}
 	}
 	CFuncs* deletion(int n){
-		if ((n<0) || (n>=count)) return this;//exeption
+		if ((n<0) || (n>=count)) { Exeption err(0,n); throw(err); return this;}//exeption
 		else{
 			CFuncs *new_f = new CFuncs(count-1);
 			for (iterator it1=new_f->begin(), it2=this->begin(); !(it1.end());it1++){
@@ -268,12 +294,12 @@ public:
 		CFuncs::iterator res=n;
 		return res.element();
 	}*/
-	/*CBaseFunc*& operator[] (const CFuncs::iterator &n){
-		CFuncs::iterator res=n;
-		return res.element();
+	/*CBaseFunc*& operator[] (iterator n){
+		//CFuncs::iterator res=n;
+		return n.element();
 	}*/
 //	CBaseFunc*& operator [] (iterator n);
-	
+	friend class CFuncs::iterator;
 };
 
 void delete_CBaseFunc(CBaseFunc **p){
@@ -287,136 +313,141 @@ void delete_CFuncs(CFuncs **p){
 }
 
 void output_ex(){
-	printf("напиши задание!\n");
+	printf("Написать программу, в которой описана иерархия классов: функция от одной переменной (арксинус,  арккосинус,  а также класс, необходимый для представления производных). Описать класс  для хранения коллекции функций (массива указателей на базовый класс), в котором перегрузить операцию  []. Описать класс-итератор для итерации по элементам коллекции. Для базового класса и его потомков перегрузить операции ==, !=, =.\n");
 }
 
 void main_menu(){
 	bool exit=false;
 	CFuncs *x=NULL;
 	while (!exit){
-		int i=0;
-		printf("\nМеню программы (для выбора действия введите номер и нажмите Return):\n");
-		printf("%d) Вывести задание.\n",i);
-		i++;
-		printf("%d) Создать пустую коллекцию.\n",i);
-		i++;
-		printf("%d) Перейти к работе с элементами коллекции.\n",i);
-		i++;
-		printf("%d) Выйти из программы.\n",i);
-		scanf("%d",&i);
-		system("clear");
-		switch(i){
-			case 0: output_ex(); break;
-			case 1:{
-				if (x){
-					printf("Хотите уничтожить существующую коллекцию и создать новую? (y/n):");
-					char c;
-					scanf("\n%c",&c);
-					if (c=='n') break;
-				}
-				printf("Введите размер коллекции:");
-				int n;
-				scanf("%d",&n);
-				x= new CFuncs(n);
-			};break;
-			case 2:{
-				if (!x) ;//exeption about no collection
-				else{
-					int k=0;
-					printf("%d) Вывести существующие элементы коллекции.\n",k);
-					k++;
-					printf("%d) Задать элемент с номером.\n",k);
-					k++;
-					printf("%d) Удалить элементы после выбранного.\n",k);
-					k++;
-					printf("%d) Вставить пустой элемент на заданное место.\n",k);
-					k++;
-					printf("%d) Вставить пустой элемент в конец.\n",k);
-					k++;
-					printf("%d) Удалить элемент коллекции.\n",k);
-					scanf("%d",&k);
-					system("clear");
-					switch(k){
-						case 0:{
-							for (CFuncs::iterator it=x->begin(); !(it.end()); it++)
-							if (it.element()){
-								printf("%d)",it.number());
-								it.element()->Print();
-								printf("\n");
-							}
-						};break;
-						case 1:{
-							printf("Введите номер элемента коллекции, которых хотите задать или переопределить:");
-							int n;
-							scanf("%d",&n);
-							CFuncs::iterator it=x->begin();
-							it+=n;
-							system("clear");
-							printf("Введите номер функции и нажмите Return.\n");
-							n=0;
-							printf("%d) k*arcsin(a*x).\n",n);
-							n++;
-							printf("%d) k*arccos(a*x).\n",n);
-							n++;
-							printf("%d) Производная текущей функции.\n",n);
-							scanf("%d",&n);
-							switch (n){
-								case 0:{
-									if (it.element()) delete_CBaseFunc(&it.element());
-									printf("Введите коэффициенты k и a через пробел.\n");
-									double k,a;
-									scanf("%lf %lf",&k,&a);
-									it.element()=new CAsin(k,a);
-								};break;
-								case 1:{
-									if (it.element()) delete_CBaseFunc(&it.element());
-									printf("Введите коэффициенты k и a через пробел.\n");
-									double k,a;
-									scanf("%lf %lf",&k,&a);
-									it.element()=new CAcos(k,a);
-								};break;
-								case 2:{
-									if (it.element()){
-										if (it.element()->have_Der()){
-											CBaseFunc *der;
-											der=it.element()->Der();
-											delete_CBaseFunc(&it.element());
-											it.element()=der;
-											der=NULL;
-										}
-										else printf("Для функции не определена производная.\n");//exeption no der
-									}
-									else printf("Не выбрана функция.\n");//exeption no func
-								};break;
-							}
-						};break;
-						case 2:{
-							printf("Введите номер элемента, после которого нужно удалить элементы:");
-							int n;
-							scanf("%d",&n);
-							x=x->truncation(n);
-						};break;
-						case 3:{
-							printf("Введите номер элемента, после которого нужно вставить пустой элемент:");
-							int n;
-							scanf("%d",&n);
-							x=x->insertion(n);
-						};break;
-						case 4:{
-							CFuncs::iterator it;
-							for (it=x->begin(); !(it.end()); it++);
-							x=x->insertion(it.number()-1);
-						};break;
-						case 5:{
-							printf("Введите номер элемента, который нужно удалить:");
-							int n;
-							scanf("%d",&n);
-							x=x->deletion(n);
-						};break;
+		try{
+			int i=0;
+			printf("\nМеню программы (для выбора действия введите номер и нажмите Return):\n");
+			printf("%d) Вывести задание.\n",i);
+			i++;
+			printf("%d) Создать пустую коллекцию.\n",i);
+			i++;
+			printf("%d) Перейти к работе с элементами коллекции.\n",i);
+			i++;
+			printf("%d) Выйти из программы.\n",i);
+			scanf("%d",&i);
+			system("clear");
+			switch(i){
+				case 0: output_ex(); break;
+				case 1:{
+					if (x){
+						printf("Хотите уничтожить существующую коллекцию и создать новую? (y/n):");
+						char c;
+						scanf("\n%c",&c);
+						if (c=='n') break;
 					}
-				}
-			};break;
-			case 3:exit=true;break;
+					printf("Введите размер коллекции:");
+					int n;
+					scanf("%d",&n);
+					x= new CFuncs(n);
+				};break;
+				case 2:{
+					if (!x) { Exeption err(1); throw(err);}//exeption about no collection
+					else{
+						int k=0;
+						printf("%d) Вывести существующие элементы коллекции.\n",k);
+						k++;
+						printf("%d) Задать элемент с номером.\n",k);
+						k++;
+						printf("%d) Удалить элементы после выбранного.\n",k);
+						k++;
+						printf("%d) Вставить пустой элемент на заданное место.\n",k);
+						k++;
+						printf("%d) Вставить пустой элемент в конец.\n",k);
+						k++;
+						printf("%d) Удалить элемент коллекции.\n",k);
+						scanf("%d",&k);
+						system("clear");
+						switch(k){
+							case 0:{
+								for (CFuncs::iterator it=x->begin(); !(it.end()); it++)
+									if (it.element()){
+										printf("%d)",it.number());
+										it.element()->Print();
+										printf("\n");
+									}
+							};break;
+							case 1:{
+								printf("Введите номер элемента коллекции, которых хотите задать или переопределить:");
+								int n;
+								scanf("%d",&n);
+								CFuncs::iterator it=x->begin();
+								it+=n;
+								system("clear");
+								printf("Введите номер функции и нажмите Return.\n");
+								n=0;
+								printf("%d) k*arcsin(a*x).\n",n);
+								n++;
+								printf("%d) k*arccos(a*x).\n",n);
+								n++;
+								printf("%d) Производная текущей функции.\n",n);
+								scanf("%d",&n);
+								switch (n){
+									case 0:{
+										if (it.element()) delete_CBaseFunc(&it.element());
+										printf("Введите коэффициенты k и a через пробел.\n");
+										double k,a;
+										scanf("%lf %lf",&k,&a);
+										it.element()=new CAsin(k,a);
+									};break;
+									case 1:{
+										if (it.element()) delete_CBaseFunc(&it.element());
+										printf("Введите коэффициенты k и a через пробел.\n");
+										double k,a;
+										scanf("%lf %lf",&k,&a);
+										it.element()=new CAcos(k,a);
+									};break;
+									case 2:{
+										if (it.element()){
+											if (it.element()->have_Der()){
+												CBaseFunc *der;
+												der=it.element()->Der();
+												delete_CBaseFunc(&it.element());
+												it.element()=der;
+												der=NULL;
+											}
+											else { Exeption err(2); throw(err);}//exeption no der
+										}
+										else { Exeption err(3); throw(err);}//exeption no func
+									};break;
+								}
+							};break;
+							case 2:{
+								printf("Введите номер элемента, после которого нужно удалить элементы:");
+								int n;
+								scanf("%d",&n);
+								x=x->truncation(n);
+							};break;
+							case 3:{
+								printf("Введите номер элемента, после которого нужно вставить пустой элемент:");
+								int n;
+								scanf("%d",&n);
+								x=x->insertion(n);
+							};break;
+							case 4:{
+								CFuncs::iterator it;
+								for (it=x->begin(); !(it.end()); it++);
+								x=x->insertion(it.number()-1);
+							};break;
+							case 5:{
+								printf("Введите номер элемента, который нужно удалить:");
+								int n;
+								scanf("%d",&n);
+								x=x->deletion(n);
+							};break;
+						}
+					}
+				};break;
+				case 3:exit=true;break;
+			}
+		}
+		catch (Exeption &e){
+			e.Print();
 		}
 	}
 	delete_CFuncs(&x);
