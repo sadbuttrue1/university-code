@@ -309,11 +309,12 @@ public:
 			return new_f;
 		}
 	}
-	CBaseFunc*& operator[] (iterator n){
-		//CFuncs::iterator res=n;
+  CBaseFunc* operator[] (iterator n) const{
 		return n.element();
 	}
-//	CBaseFunc*& operator [] (iterator n);
+	CBaseFunc*& operator[] (iterator n){
+		return n.element();
+	}
 	friend class CFuncs::iterator;
 };
 
